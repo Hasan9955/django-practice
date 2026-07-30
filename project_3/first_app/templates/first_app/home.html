@@ -29,5 +29,50 @@
         <h4> You're a child </h4>
         {% endif %}
 
+        
+        {% comment %} <h1>{{ " " | default: "an empty string"}}</h1> {% endcomment %}
+    
+        <h1>value: {{ val | capfirst }}</h1>
+        <h1>Length: {{ val | length }}</h1>
+        <h1>{{ "" | default:"an empty string"}}</h1>
+        <h1>{{courses | dictsort:"name"}}</h1>
+        <h1>{{courses | first }}</h1>
+        <h1>{{courses | last  }}</h1>
+        <h1>{{ new_list | linenumbers  }}</h1>
+        <h1>{{ new_list | first | lower  }}</h1>
+        <h1>{{ new_list | first | upper  }}</h1>
+        <h1>{{ new_list | random  }}</h1>
+        <h1>{{ new_list | slice:2  }}</h1>
+        <h1>{{ val | title  }}</h1>
+        <h1>{{ val | truncatechars:6  }}</h1>
+        <h1>{{ val | wordcount  }}</h1>
+        <h1>{{ val | truncatewords:2  }}</h1>
+
+
+        <h1>{{new_list}}</h1>
+        <h1>{{ new_list | join:" " }} </h1>
+        <h1>{{ birthdate }} </h1>
+        <h1>{{ birthdate | date:"D d M Y" }} </h1>
+        <h1>{{ "12:30:00.000123+02:00" | time:"H\h i\m" }} </h1>
+
+
+        
+
+    </br>
+        {% comment %} For loop {% endcomment %}
+
+        {%  for i in courses %}
+
+        <h3>ID: {{i.id}}</h3>
+        <h3>Name: {{i.name}}</h3>
+        <h3>Price: {{i.price}}</h3>
+
+        <h3>---------------------</h3>
+        <h3>---------------------</h3>
+        {% endfor %}
+
+        
+
+
     </body>
 </html>
