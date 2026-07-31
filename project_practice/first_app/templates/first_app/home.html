@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <h1>This is App Home page</h1>
+            <h2>GO HOME: <button><a href='/'>HOME</a></button> </h2>
+
+            
+        <h1>Birth Day: {{birthdate}}</h1>
+        <h1>Length: {{ val | length }}</h1>
+        <h1>Age: {{ age | add:"2" }}</h1>
+        <h1>Author: {{ author | capfirst }}</h1>
+        <h1>Birth Date: {{ birthdate | date:"D d M Y" }}</h1>
+        <h1>Profession: {{profession | addslashes }}</h1>
+        <h1>Cut: {{val | cut:" " }}</h1>
+        <h1>dictsort: {{courses | dictsort:"name" }}</h1>
+        <h1>Join: {{list | join:"|" }}</h1>
+        <h1>divisibleby {{age}} by 2: {{age | divisibleby:"2" }}</h1>
+        <h1>list: {{list }}</h1>
+        <h1>first: {{list | first }}</h1>
+        <h1>last: {{list | last }}</h1>
+        <h1>random: {{ list | random }}</h1>
+        <h1>make_list: {{ val | make_list }}</h1>
+        <h1>slugify: {{ val | slugify | title }}</h1>
+        <h1>time: {{ time | time:"H:i" }}</h1>
+        <h1>wordcount: {{ val | wordcount }}</h1>
+        <h1>timesince: {{ birthdate | timesince }}</h1>
+        <h1>unordered_list: {{ unorderedlist | unordered_list }}</h1>
+
+
+
+
+
+        
+    </body>
+</html>
