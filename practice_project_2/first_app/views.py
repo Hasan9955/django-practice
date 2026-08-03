@@ -68,13 +68,15 @@ def submit_form(request):
     #     return render(request, 'form.html', {'name': name, 'email': email})
     # else:
     #     return render(request, 'form.html')
-    
+
     return render(request, 'form.html')
 
 def about(request):
     if request.method == 'POST':
+            print(request.POST)
             name = request.POST.get('username')
             email = request.POST.get('email')
-            return render(request, 'about.html', {'name': name, 'email': email})
+            select = request.POST.get('select')
+            return render(request, 'about.html', {'name': name, 'email': email, 'select': select})
     else:
         return render(request, 'about.html')

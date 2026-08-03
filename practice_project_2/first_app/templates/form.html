@@ -1,35 +1,36 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 
 {% block content %}
-
-<div class="">
-    
+  <div style="width: 50%; height: 500px; margin: auto" class="pt-5">
+    <h3>Movie Rating Form</h3>
     <form method="post" action="/first_app/about/">
-        {% csrf_token %}
-  <div class="mb-3">
-    <div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" name="username">
+      {% csrf_token %}
+      <div class="mb-3">
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" name="username" />
+        </div>
+
+        <div class="mb-3">
+          <label for="exampleInputEmail" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" />
+        </div>
+
+        <label for="select1" class="form-label">Rating</label>
+        <select class="form-select" aria-label="Default select example" id="select1" name="select">
+          <option selected>Open this select menu</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+          <option value="4">Four</option>
+          <option value="5">Five</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    {% comment %} <h3>Name: {{ name }}</h3>
+    <h3>Email: {{ email }}</h3> {% endcomment %}
   </div>
-
-    <label for="exampleInputEmail" class="form-label">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
-    <div id="EmailHelp" class="form-text">We'll never share your email with anyone else.</div>
-  </div>
-{% comment %}   
-  <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div> {% endcomment %}
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
-{% comment %} <h3>Name:  {{name}}</h3>
-<h3>Email:  {{email}}</h3> {% endcomment %}
-
-
-</div>
-
-
-{% endblock  %}
+{% endblock %}
