@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>This is From About Page</h1>
+
+  {% if name and email %}
+    <h3>Name: {{ name }}</h3>
+  <h3>Email: {{ email }}</h3>
+  {% endif %}
+{% endblock %}

@@ -58,3 +58,23 @@ def index(request):
     ]
 
     return render(request, 'index.html', {'data': meals})
+
+def submit_form(request):
+    # print(request.POST)
+
+    # if request.method == 'POST':
+    #     name = request.POST.get('username')
+    #     email = request.POST.get('email')
+    #     return render(request, 'form.html', {'name': name, 'email': email})
+    # else:
+    #     return render(request, 'form.html')
+    
+    return render(request, 'form.html')
+
+def about(request):
+    if request.method == 'POST':
+            name = request.POST.get('username')
+            email = request.POST.get('email')
+            return render(request, 'about.html', {'name': name, 'email': email})
+    else:
+        return render(request, 'about.html')

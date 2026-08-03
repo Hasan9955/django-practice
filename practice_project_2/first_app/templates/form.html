@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="">
+    
+    <form method="post" action="/first_app/about/">
+        {% csrf_token %}
+  <div class="mb-3">
+    <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="username">
+  </div>
+
+    <label for="exampleInputEmail" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
+    <div id="EmailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+{% comment %}   
+  <div class="mb-3 form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+  </div> {% endcomment %}
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% comment %} <h3>Name:  {{name}}</h3>
+<h3>Email:  {{email}}</h3> {% endcomment %}
+
+
+</div>
+
+
+{% endblock  %}
