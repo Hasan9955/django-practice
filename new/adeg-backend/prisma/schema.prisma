@@ -1,0 +1,1154 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  socialLoginType SOCIALLOGINTYPES @default(EMAIL_PASSWORD)
+  fullName        String
+  location        String?
+  email           String           @unique
+
+  role            UserRole @default(USER)
+  password        String?  @default("")
+  companyName     String?
+  phoneNumber     String?
+  deliveryAddress String?
+  zipCode         String?
+  city            String?
+  state           String?
+  profileImage    String   @default("")
+  coverPhoto      String   @default("")
+  customerId      String?
+  rewardPoint     Int      @default(0)
+
+  sentMessages     PrivateMessage[] @relation("SentMessages")
+  receivedMessages PrivateMessage[] @relation("ReceivedMessages")
+
+  ticketCreator  Ticket[] @relation("ticketCreator")
+  ticketReceiver Ticket[] @relation("ticketReceiver")
+
+  RefundCustomer Refund[] @relation("RefundCustomer")
+  RefundSeller   Refund[] @relation("RefundSeller")
+
+  user1Convarsion Conversation[] @relation("User1Convarsion")
+  user2Convarsion Conversation[] @relation("User2Convarsion")
+
+  admin       Admin?
+  isOtpVerify Boolean @default(false)
+  isProfile   Boolean @default(false)
+
+  Notifications      Notifications[]
+  reciveNotificaiton Boolean         @default(false)
+  fcmToken           String?
+  isSubscription     Boolean         @default(false)
+
+  status UserStatus @default(ACTIVE)
+  Otp    Otp[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Profile   Profile?
+  isDeleted Boolean  @default(false)
+
+  Group        Group[]
+  UserGroup    UserGroup[]
+  GroupMessage GroupMessage[]
+  store        Store[]
+  Cart         Cart[]
+  review       Review[]
+  View         View[]
+  Order        Order[]
+  NicheHub     NicheHub[]
+  Like         Like[]
+  Comment      Comment[]
+  PollVote     PollVote[]
+  Share        Share[]
+  Follower     Follow[]       @relation("Follower")
+  cutomerOffer B2BOffer[]     @relation("buyerInfo")
+  sellerOffer  B2BOffer[]     @relation("sellerInfo")
+
+  Withdraw         Withdraw[]
+  UserSubscription UserSubscription?
+  StoreSubscriber  StoreSubscriber?
+  reportNicheHubs  ReportNicheHub[]
+
+  userBlocked BlockUser[] @relation("blockedBy") // This user blocks others
+  blockedUser BlockUser[] @relation("blocked") // Others block this user
+
+  @@map("users")
+}
+
+// Add to your prisma schema
+
+model EmailSuppression {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  email          String   @unique
+  reason         String // PERMANENT_BOUNCE, SPAM_COMPLAINT, MANUAL
+  diagnosticCode String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("email_suppressions")
+}
+
+model BlockUser {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  blockedId String @db.ObjectId
+
+  blockedBy User @relation(fields: [userId], references: [id], onDelete: Cascade, name: "blockedBy")
+  blocked   User @relation(fields: [blockedId], references: [id], onDelete: Cascade, name: "blocked")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId    String   @unique @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profile")
+}
+
+model Admin {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  nickName String @unique
+  password String
+  email    String @unique
+  userId   String @unique @db.ObjectId
+  user     User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Banner {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  bannerUrl   String
+  title       String
+  redirectUrl String?
+  description String
+  platformId  String            @db.ObjectId
+  platform    PlatformMangement @relation(references: [id], fields: [platformId])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("banners")
+}
+
+model CmsSetting {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  bannerImage String?
+  redirectUrl String?
+  title       String?
+  aboutUs     String?
+
+  platformId    String            @unique @db.ObjectId
+  platform      PlatformMangement @relation(references: [id], fields: [platformId])
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  faq           Faq[]
+  footer        Footer?
+  privacyPolicy PrivacyPolicy?
+
+  @@map("cmsSetting")
+}
+
+model Footer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  companyInfo        String?
+  news               String?
+  invertors          String?
+  polices            String?
+  registration       String?
+  moneyBackGuarantee String?
+  seamlessBuying     String?
+  sellerAccount      String?
+  learnToSell        String?
+  facebookUrl        String?
+  twitterUrl         String?
+  instagramUrl       String?
+  linkedInUrl        String?
+  youtubeUrl         String?
+  contactEmail       String?
+  contactPhone       String?
+  contactAddress     String?
+
+  cmsSettingId String     @unique @db.ObjectId
+  cms          CmsSetting @relation(references: [id], fields: [cmsSettingId], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("footer")
+}
+
+model Faq {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  question     String
+  answer       String
+  cmsSettingId String     @db.ObjectId
+  cms          CmsSetting @relation(references: [id], fields: [cmsSettingId])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("faq")
+}
+
+model PrivacyPolicy {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  content      String
+  cmsSettingId String     @unique @db.ObjectId
+  cms          CmsSetting @relation(references: [id], fields: [cmsSettingId])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("privacyPolicy")
+}
+
+model Cart {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String       @db.ObjectId
+  productId String       @db.ObjectId
+  variantId String       @db.ObjectId
+  bundleId  String?      @db.ObjectId
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  variant   Varient      @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  bundle    BundleOffer? @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId, variantId])
+  @@map("cart")
+}
+
+model Category {
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  name          String            @unique
+  displayName   String
+  categoryPhoto String?
+  isDeleted     Boolean           @default(false)
+  platformId    String            @db.ObjectId
+  platform      PlatformMangement @relation(references: [id], fields: [platformId])
+  parentId      String?           @db.ObjectId
+  ancestors     String[]          @db.ObjectId
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  product   Product[]
+  Attribute Attribute[]
+
+  @@map("categories")
+}
+
+model Attribute {
+  id         String           @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  type       AttributeType
+  isRequired Boolean          @default(false)
+  categoryId String           @db.ObjectId
+  category   Category         @relation(fields: [categoryId], references: [id])
+  values     AttributeValue[]
+}
+
+model AttributeValue {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  value       String
+  isApproved  Boolean   @default(false)
+  attributeId String    @db.ObjectId
+  attribute   Attribute @relation(fields: [attributeId], references: [id])
+}
+
+model Product {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  productName       String
+  basePrice         Float         @default(0)
+  discountPrice     Float         @default(0)
+  totalView         Int           @default(0)
+  discountStartDate DateTime
+  discountEndTime   DateTime
+  desc              String
+  productDetails    String
+  avgRating         Float         @default(0)
+  totalSale         Int           @default(0)
+  isPublished       Boolean       @default(true)
+  productPhoto      String[]
+  searchTag         String[]
+  isDeleted         Boolean       @default(false)
+  productStatus     ProductStatus @default(NewArrival)
+  categoryId        String        @db.ObjectId
+  category          Category?     @relation(references: [id], fields: [categoryId], onDelete: Cascade)
+  storeId           String        @db.ObjectId
+  shop              Store         @relation(references: [id], fields: [storeId], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  B2BPackage        B2BPackage[]
+  BundleOffer       BundleOffer[]
+  Cart              Cart[]
+  Varient           Varient[]
+  Review            Review[]
+  View              View[]
+
+  Offer_Items B2B_Offer_Items[]
+  productFaq  ProductFaq[]
+  nicheHubs   NicheHub[]
+
+  @@map("products")
+}
+
+model View {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("views")
+}
+
+model Varient {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  sku            String
+  stock          Int
+  price          Float
+  attributes     Json
+  productId      String          @db.ObjectId
+  product        Product         @relation(references: [id], fields: [productId], onDelete: Cascade)
+  varientCoupons VarientCoupon[]
+  Cart           Cart[]
+  Order          Order[]
+
+  @@map("varient")
+}
+
+model Coupon {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  code           String          @unique
+  storeId        String?         @db.ObjectId
+  discountType   DiscountType
+  discountValue  Float
+  validFrom      DateTime
+  validTill      DateTime
+  store          Store?          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  varientCoupons VarientCoupon[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@map("coupon")
+}
+
+model VarientCoupon {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  varientId String  @db.ObjectId
+  couponId  String  @db.ObjectId
+  varient   Varient @relation(fields: [varientId], references: [id], onDelete: Cascade)
+  coupon    Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([varientId, couponId])
+  @@map("varient_coupon")
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating    Float
+  comment   String
+  image     String[]
+  video     String?
+  productId String?  @db.ObjectId
+  userId    String?  @db.ObjectId
+  product   Product? @relation(references: [id], fields: [productId])
+  user      User?    @relation(references: [id], fields: [userId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model B2BPackage {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  quantity      String
+  price         Float
+  moq           Int        @default(1)
+  maxMOQ        Int?
+  pricePerUnit  Float      @default(0)
+  b2bPackageTag PackageTag @default(SmallSupply)
+  productId     String     @db.ObjectId
+  product       Product    @relation(references: [id], fields: [productId], onDelete: Cascade)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("b2bPackage")
+}
+
+enum PackageTag {
+  SmallSupply
+  MediumSupply
+  LargeSupply
+}
+
+model BundleOffer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  quantity  Int
+  discount  Float
+  bundleTag String
+  productId String   @db.ObjectId
+  product   Product  @relation(references: [id], fields: [productId], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Cart      Cart[]
+  Order     Order[]
+
+  @@map("bundleOffer")
+}
+
+model Store {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  bannerImage   String
+  name          String
+  slug          String      @unique
+  shopName      String
+  desc          String
+  phoneNumber   String
+  totalWithdraw Float       @default(0.0)
+  followers     Int         @default(0)
+  followings    Int         @default(0)
+  email         String
+  shopLogo      String
+  status        storeStatus @default(Pending)
+  sellerId      String      @unique @db.ObjectId
+  seller        User        @relation(references: [id], fields: [sellerId], onDelete: Cascade)
+
+  country String?
+  city    String?
+  address String?
+  zipcode String?
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  Product          Product[]
+  Coupon           Coupon[]
+  Order            Order[]
+  Follow           Follow[]
+  shippingOption   ShippingOption?
+  storeSubscribers StoreSubscriber[]
+
+  @@map("store")
+}
+
+model ShippingOption {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  shippingZone     String
+  freeShippingZone String
+  storeId          String @unique @db.ObjectId
+  store            Store  @relation(references: [id], fields: [storeId], onDelete: Cascade)
+
+  insideCityRate        Float?
+  outsideCityRate       Float?
+  // freeAreaRate    Float?
+  isFreeShippingEnabled Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // shippingRates     shippingRate[]
+  // logisticsPartners logisticsPartner[]
+
+  @@map("shippingOptions")
+}
+
+// model shippingRate {
+//   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+//   packageName        String
+//   packageDescription String
+//   packagePrice       Float
+//   shippingOptionId   String         @db.ObjectId
+//   shippingOption     ShippingOption @relation(references: [id], fields: [shippingOptionId], onDelete: Cascade)
+//   createdAt          DateTime       @default(now())
+//   updatedAt          DateTime       @updatedAt
+
+//   @@map("shippingRates")
+// }
+
+// model logisticsPartner {
+//   id               String         @id @default(auto()) @map("_id") @db.ObjectId
+//   logo             String?
+//   currierName      String
+//   shippingZone     String
+//   areaRates        String
+//   deliveryTime     String
+//   shippingOptionId String         @db.ObjectId
+//   shippingOption   ShippingOption @relation(references: [id], fields: [shippingOptionId], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("logisticsPartners")
+// }
+
+model Follow {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId String?  @db.ObjectId
+  storeId    String?  @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  follower User?  @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  store    Store? @relation(fields: [storeId], references: [id])
+
+  @@map("follows")
+}
+
+model Otp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  otpCode   String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("otps")
+}
+
+model PlatformMangement {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  currency       String[]
+  commisionRate  Float?
+  shippingPolicy String[]
+
+  category   Category[]
+  banner     Banner[]
+  logo       String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  CmsSetting CmsSetting[]
+
+  @@map("platfromManagement")
+}
+
+model Group {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  groupImage   String
+  description  String?        @default("")
+  adminId      String         @db.ObjectId
+  admin        User           @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  members      UserGroup[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  groupMessage GroupMessage[]
+
+  @@map("groups")
+}
+
+model UserGroup {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String @db.ObjectId
+  groupId String @db.ObjectId
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, groupId])
+  @@map("user_groups")
+}
+
+model GroupMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String   @db.ObjectId
+  senderId  String   @db.ObjectId
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content   String
+  seenBy    String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId, senderId])
+  @@map("group_message")
+}
+
+model PrivateMessage {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  senderId       String        @db.ObjectId
+  receiverId     String        @db.ObjectId
+  content        Json?
+  offerId        String?       @db.ObjectId
+  messageType    MessageType   @default(PRIVATEMESSAGE)
+  imageUrl       String?
+  conversationId String?       @db.ObjectId
+  ticketId       String?       @db.ObjectId
+  refundId       String?       @db.ObjectId
+  read           Boolean       @default(false)
+  sender         User?         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver       User?         @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  B2BOffer       B2BOffer?     @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  Ticket         Ticket?       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  Refund         Refund?       @relation(fields: [refundId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("private_messages")
+}
+
+model Conversation {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id        String             @db.ObjectId
+  user2Id        String             @db.ObjectId
+  chatType       ChatType           @default(GENERAL)
+  lastMessage    String?
+  user1          User?              @relation("User1Convarsion", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2          User?              @relation("User2Convarsion", fields: [user2Id], references: [id], onDelete: Cascade)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  status         ConversationStatus @default(DEACTIVE)
+  privateMessage PrivateMessage[]
+  B2BOffer       B2BOffer[]
+
+  @@unique([user1Id, user2Id])
+  @@map("conversations")
+}
+
+enum ChatType {
+  GENERAL
+  B2B
+}
+
+model Ticket {
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  ticketName        String
+  ticketDescription String
+  priority          TicketPriority   @default(MEDIUM)
+  department        TicketDepartment
+  ticketStatus      TicketStatus     @default(NEW)
+  tickerRole        UserRole
+  ticketCreatorId   String?          @db.ObjectId
+  ticketReceiverId  String?          @db.ObjectId
+  ticketCreator     User?            @relation("ticketCreator", fields: [ticketCreatorId], references: [id], onDelete: Cascade)
+  ticketReceiver    User?            @relation("ticketReceiver", fields: [ticketReceiverId], references: [id], onDelete: Cascade)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  privateMessage    PrivateMessage[]
+
+  @@map("tickets")
+}
+
+model Refund {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  orderId        String           @db.ObjectId
+  order          Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refundReason   String
+  refundStatus   RefundStatus     @default(PENDING)
+  customerId     String           @db.ObjectId
+  sellerId       String           @db.ObjectId
+  customer       User?            @relation("RefundCustomer", fields: [customerId], references: [id], onDelete: Cascade)
+  seller         User?            @relation("RefundSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  privateMessage PrivateMessage[]
+
+  @@map("refunds")
+}
+
+model Promotion {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  category       String
+  isPublished    Boolean  @default(true)
+  promotionImage String?
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("promotions")
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Notifications {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId String   @db.ObjectId
+  body       String
+  title      String
+  user       User     @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("notifications")
+}
+
+model Payment {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount          Float
+  isPaid          Boolean       @default(false)
+  status          PaymentStatus @default(Paid)
+  paymentIntentId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  Order           Order[]
+
+  @@map("payments")
+}
+
+model Order {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String?   @db.ObjectId
+  storeId         String?   @db.ObjectId
+  variantId       String?   @db.ObjectId
+  name            String?
+  phoneNumber     String?
+  currency        String
+  bundleId        String?   @db.ObjectId
+  orderNumber     String    @unique
+  region          String    @default("Other")
+  country         String?
+  state           String?
+  city            String?
+  zipCode         String?
+  deliveryAddress String?
+  isPaid          Boolean   @default(false)
+  orderStatus     OrderEnum @default(Pending)
+  price           Float     @default(0.0)
+  deliveryFee     Float     @default(0.0)
+  quantity        Int       @default(0)
+  paymentId       String    @db.ObjectId
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  isReviewed      Boolean   @default(false)
+
+  //relation
+  user    User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store   Store?       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  variant Varient?     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  bundle  BundleOffer? @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  payment Payment      @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  Refund  Refund[]
+
+  @@map("orders")
+}
+
+model NicheHub {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String     @db.ObjectId
+  productId    String?    @db.ObjectId
+  title        String
+  fileUrl      String[]
+  isPublished  Boolean    @default(true)
+  commentCount Int        @default(0)
+  likeCount    Int        @default(0)
+  shareCount   Int        @default(0)
+  visibility   Visibility @default(ALL)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  product         Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like            Like[]
+  Comment         Comment[]
+  Poll            Poll[]
+  Share           Share[]
+  reportNicheHubs ReportNicheHub[]
+
+  @@map("nicheHub")
+}
+
+model ReportNicheHub {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  nicheHubId   String       @db.ObjectId
+  userId       String       @db.ObjectId
+  reason       String
+  reasonType   ReasonType
+  reportStatus ReportStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  nicheHub NicheHub @relation(fields: [nicheHubId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([nicheHubId, userId])
+  @@map("reportNicheHub")
+}
+
+enum ReasonType {
+  SPAM
+  INAPPROPRIATE
+  HARASSMENT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+}
+
+model Poll {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  nicheHubId String       @db.ObjectId
+  question   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  nicheHub   NicheHub     @relation(fields: [nicheHubId], references: [id], onDelete: Cascade)
+  options    PollOption[]
+  PollVote   PollVote[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  pollId    String     @db.ObjectId
+  text      String
+  voteCount Int        @default(0)
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes     PollVote[]
+
+  @@map("pollsOptions")
+}
+
+model PollVote {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  pollId    String     @db.ObjectId
+  optionId  String     @db.ObjectId
+  userId    String     @db.ObjectId
+  createdAt DateTime   @default(now())
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@map("pollVotes")
+}
+
+model Like {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  nicheHubId String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nicheHub   NicheHub @relation(fields: [nicheHubId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, nicheHubId])
+  @@map("likes")
+}
+
+model Comment {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nicheHubId String?  @db.ObjectId
+  userId     String?  @db.ObjectId
+  parentId   String?  @db.ObjectId
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  nicheHub NicheHub? @relation(fields: [nicheHubId], references: [id], onDelete: Cascade)
+  user     User?     @relation(fields: [userId], references: [id])
+  parent   Comment?  @relation("CommentToReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies  Comment[] @relation("CommentToReplies")
+
+  @@map("comments")
+}
+
+model Share {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  nicheHubId String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nicheHub   NicheHub @relation(fields: [nicheHubId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("shares")
+}
+
+model B2BOffer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  conversationId String?       @db.ObjectId
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  offerStuts           OfferStatus       @default(PENDING)
+  isDelivered          Boolean           @default(false)
+  buyerId              String            @db.ObjectId
+  buyer                User?             @relation("buyerInfo", references: [id], fields: [buyerId], onDelete: Cascade)
+  sellerId             String            @db.ObjectId
+  seller               User?             @relation("sellerInfo", references: [id], fields: [sellerId], onDelete: Cascade)
+  expectedDeliveryDate DateTime
+  totalPrice           Float             @default(0)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  offer_Items          B2B_Offer_Items[]
+  PrivateMessage       PrivateMessage[]
+
+  @@map("offer")
+}
+
+model B2B_Offer_Items {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  productId String  @db.ObjectId
+  product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
+
+  offerId String   @db.ObjectId
+  offer   B2BOffer @relation(references: [id], fields: [offerId], onDelete: Cascade)
+
+  unitPrice Float
+  quantity  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("offer_items")
+}
+
+model Withdraw {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  sellerId    String         @db.ObjectId
+  amount      Float          @default(0.0)
+  bankName    String
+  accountNo   String
+  accountName String
+  sortCode    String?
+  status      WithdrawStatus @default(Pending)
+  seller      User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("withdraws")
+}
+
+model Subscription {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  pricingId        String?            @unique
+  productId        String?            @unique
+  heading          String?
+  interval         IntervalType
+  interval_count   Int
+  price            Float
+  off              Float              @default(0.0)
+  title            String
+  type             SubscriptionType
+  isActive         Boolean            @default(true)
+  features         Json               @db.Json
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  UserSubscription UserSubscription[]
+
+  @@map("subscription")
+}
+
+model UserSubscription {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String             @unique @db.ObjectId
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId    String?            @db.ObjectId
+  subscription      Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  priceId           String?
+  startDate         DateTime?
+  endDate           DateTime?
+  subscriptionPayId String?            
+  status            SubscriptionStatus @default(PENDING)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([userId, subscriptionId])
+  // @@unique([userId, priceId])
+  @@map("userSubscription")
+}
+
+model ProductFaq {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  question String
+  answer   String
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("productFaq")
+}
+
+model StoreSubscriber {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  storeId   String   @db.ObjectId
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userEmail String
+  userId    String?  @unique @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("storeSubscribers")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  DEACTIVE
+  FAILED
+}
+
+enum IntervalType {
+  day
+  week
+  month
+  year
+}
+
+enum SubscriptionType {
+  STARTERPRO
+  SCALERPRO
+  ELITE
+  FREE
+}
+
+enum WithdrawStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum MessageType {
+  PRIVATEMESSAGE
+  OFFER
+  B2B
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+enum Visibility {
+  ALL
+  FOLLOWER
+}
+
+enum PaymentStatus {
+  Paid
+  Pending
+  Cancel
+  Refund
+}
+
+enum OrderEnum {
+  Pending
+  Accepted
+  Rejected
+  Shipped
+  Delivered
+  Refunded
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  DROPDOWN
+  MULTISELECT
+  BOOLEAN
+  DATE
+}
+
+enum DiscountType {
+  FIXED
+  PERCENTAGE
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+  PENDING
+}
+
+enum UserRole {
+  ADMIN
+  SUB_ADMIN
+  USER
+  SELLER
+  BUYER
+  ALL
+}
+
+enum ConversationStatus {
+  ACTIVE
+  DEACTIVE
+}
+
+enum SOCIALLOGINTYPES {
+  GOOGLE
+
+  FACEBOOK
+  APPLE
+  EMAIL_PASSWORD
+}
+
+enum ProductStatus {
+  NewArrival
+  TopSelling
+  SuperDeal
+  StockOut
+  FlashSale
+}
+
+enum storeStatus {
+  Pending
+  Approved
+  Blocked
+  Rejected
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TicketDepartment {
+  FINANCE
+  SUPPORT
+  MARKETING
+  SALES
+}
+
+enum TicketStatus {
+  NEW
+  OPEN
+  SOLVED
+  CANCEL
+}
