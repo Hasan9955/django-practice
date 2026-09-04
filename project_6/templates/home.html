@@ -2,38 +2,44 @@
 {% load static %}
 
 {% block content %}
-<h1>This Home page</h1>
+<h1 class="text-center mt-5">This Home page</h1>
 <!-- <img src="{% static 'bird2.jpg' %}" alt="" /> -->
 
 {% if data %}
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
-        </tr>
-    </thead>
-    <tbody>
-
-
-        {% for i in data %}
-
-        <tr>
-            <th scope="row">{{forloop.counter}}</th>
-            <td>{{i.name}}</td>
-            <td>{{i.roll}}</td>
-            <td>{{i.father_name}}</td>
-        </tr>
-
-
-        {% endfor %}
-
-    </tbody>
-</table>
+<div class="container mt-5 mb-5 ">
+    <table class="table text-center table-bordered table-striped">
+        <thead>
+            <tr>
+                <th scope="col">SL</th>
+                <th scope="col">Name</th>
+                <th scope="col">Roll</th>
+                <th scope="col">Father's Name</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+    
+    
+            {% for i in data %}
+    
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{i.name}}</td>
+                <td>{{i.roll}}</td>
+                <td>{{i.father_name}}</td>
+                <td>
+                    <a href="#" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'delete_student' i.roll %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+    
+    
+            {% endfor %}
+    
+        </tbody>
+    </table>
+</div>
 
 
 
