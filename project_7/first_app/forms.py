@@ -20,3 +20,24 @@ class StudentForm(forms.ModelForm):
             "roll": forms.NumberInput(attrs={"class": "form-control"}),
             "address": forms.Textarea(attrs={"class": "form-control"}),
         }
+
+        help_texts = {
+            "roll": "Enter your roll number",
+            "name": "Enter your name",
+            "address": "Enter your address",
+        }
+
+        error_messages = {
+            "roll": {
+                "required": "Roll number is required",
+                "invalid": "Enter a valid roll number",
+            },
+            "name": {
+                "required": "Name is required",
+                "invalid": "Enter a valid name",
+            },
+            "address": {
+                "required": "Address is required",
+                "invalid": "Enter a valid address",
+            },
+        }
