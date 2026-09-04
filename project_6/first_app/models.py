@@ -6,3 +6,5 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     roll = models.IntegerField(primary_key=True)
     address = models.CharField(max_length=100)
+    father_name = models.TextField(default='Father Name')
+
