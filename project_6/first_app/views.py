@@ -3,10 +3,10 @@ from . import models
 
 
 
-def index(request):
+def home(request):
     students = models.Student.objects.all()
 
-    return render(request, "first_app/index.html")
+    return render(request, "home.html")
 
 
 # Create your views here.
