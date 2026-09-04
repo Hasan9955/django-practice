@@ -1,4 +1,13 @@
 from django.shortcuts import render
+from . import models
+
+
+
+def index(request):
+    students = models.Student.objects.all()
+
+    return render(request, "first_app/index.html")
+
 
 # Create your views here.
 
