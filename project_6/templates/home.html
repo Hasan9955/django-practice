@@ -2,7 +2,44 @@
 {% load static %}
 
 {% block content %}
-  <h1>This Home page</h1>
-  <img src="{% static 'bird2.jpg' %}" alt="" />
+<h1>This Home page</h1>
+<!-- <img src="{% static 'bird2.jpg' %}" alt="" /> -->
+
+{% if data %}
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+        </tr>
+    </thead>
+    <tbody>
+
+
+        {% for i in data %}
+
+        <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{i.name}}</td>
+            <td>{{i.roll}}</td>
+            <td>{{i.father_name}}</td>
+        </tr>
+
+
+        {% endfor %}
+
+    </tbody>
+</table>
+
+
+
+{%else%}
+
+<h1>No data found</h1>
+
+{% endif %}
 {% endblock %}
- 

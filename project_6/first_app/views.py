@@ -5,8 +5,8 @@ from . import models
 
 def home(request):
     students = models.Student.objects.all()
-
-    return render(request, "home.html")
+    print(students)
+    return render(request, "home.html", {'data' : students})
 
 
 # Create your views here.
