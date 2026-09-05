@@ -6,6 +6,7 @@ from django.db import models
 class StudentModel(models.Model):
     roll = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100, unique=True)
     address = models.CharField(max_length=100)
 
     def __str__(self):

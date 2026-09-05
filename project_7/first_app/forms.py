@@ -13,18 +13,21 @@ class StudentForm(forms.ModelForm):
             "roll": "Roll Number",
             "name": "Student Name",
             "address": "Student Address",
+            "email": "Student Email",
         }
 
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "roll": forms.NumberInput(attrs={"class": "form-control"}),
             "address": forms.Textarea(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
         }
 
         help_texts = {
             "roll": "Enter your roll number",
             "name": "Enter your name",
             "address": "Enter your address",
+            "email": "Enter your email",
         }
 
         error_messages = {
@@ -39,5 +42,9 @@ class StudentForm(forms.ModelForm):
             "address": {
                 "required": "Address is required",
                 "invalid": "Enter a valid address",
+            },
+            "email": {
+                "required": "Email is required",
+                "invalid": "Enter a valid email",
             },
         }
